@@ -237,21 +237,12 @@ apos.getTopModalOrBody = function() {
 // that does not have the apos-filter class.
 
 // Modals may be nested and the right thing will happen.
-
-apos.modal = function(sel, options) {
-
+apos.setupModalListeners = function(sel, options) {
   if (!apos._modalInitialized) {
     apos._modalInitialized = true;
     // Just ONE event handler for the escape key so we don't have
     // modals falling all over themselves to hide each other
     // consecutively.
-
-    // Escape key should dismiss the top modal, if any
-
-    // $(document).on('keyup.aposModal', function(e) {
-    //   // console.log(e);
-
-    // });
 
     function closeModal() {
       var topModal = apos.getTopModalOrBody();
@@ -303,12 +294,19 @@ apos.modal = function(sel, options) {
     }
 
     apos._modalStack.pop();
-    var blackoutContext = apos.getTopModalOrBody();
-    var blackout = blackoutContext.find('.apos-modal-blackout');
-    if (blackout.data('interval')) {
-      clearInterval(blackout.data('interval'));
+
+    // remove the modal-container and blackout
+    // if all other modals are closed
+    if(apos._modalStack.length < 1) {
+      console.log('last before body')
+      $('.apos-modal-container').remove();
+      var blackout = $('.apos-modal-blackout');
+      if (blackout.data('interval')) {
+        clearInterval(blackout.data('interval'));
+      }
+      blackout.remove();
     }
-    blackout.remove();
+
     $el.hide();
     apos.popSelection();
     options.afterHide(function(err) {
@@ -345,7 +343,17 @@ apos.modal = function(sel, options) {
     var $button = $(this);
     saveModal($button.is('[data-next]'));
     return false;
-  });
+  });  
+}
+
+apos.modal = function(sel, options) {
+  apos.setupModalListeners(sel, options);
+
+  var $el = $(sel);
+
+  if (!options) {
+    options = {};
+  }
 
   apos.afterYield(function() {
     options.init(function(err) {
@@ -355,42 +363,71 @@ apos.modal = function(sel, options) {
       }
       apos.pushSelection();
 
-      // Black out the document or the top modal if there already is one.
-      // If we are blacking out the body height: 100% won't cover the entire document,
-      // so address that by tracking the document height with an interval timer
-      var blackoutContext = apos.getTopModalOrBody();
       var blackout = $('<div class="apos-modal-blackout"></div>');
-      if (blackoutContext.prop('tagName') === 'BODY') {
-        var interval = setInterval(function() {
-          var contextHeight = $(document).height();
-          if (blackout.height() !== contextHeight) {
-            blackout.height(contextHeight);
-          }
-          blackout.data('interval', interval);
-        }, 200);
-      }
-      blackoutContext.append(blackout);
+      var interval = setInterval(function() {
+        var contextHeight = $(document).height();
+        if (blackout.height() !== contextHeight) {
+          blackout.height(contextHeight);
+        }
+        blackout.data('interval', interval);
+      }, 200);
+
+      $('body').append(blackout);
+
       // Remember scroll top so we can easily get back
       $el.data('aposSavedScrollTop', $(window).scrollTop());
       apos._modalStack.push($el);
-      $('body').append($el);
+
+      $el.addClass('apos-base-modal');
+      var $container = $('<div class="apos-modal-container"></div>');
+      $container.append($el);
+      $('body').append($container);
+
       var offset;
-      if ($el.hasClass('apos-modal-full-page')) {
-        offset = $('.apos-admin-bar').height();
-      } else {
-        offset = 100;
-      }
-      $el.offset({ top: $('body').scrollTop() + offset, left: ($(window).width() - $el.outerWidth()) / 2 });
+      $container.offset({ top: $('body').scrollTop() + offset, left: ($(window).width() - $el.outerWidth()) / 2 });
       $el.show();
-      // Give the focus to the first form element. (Would be nice to
-      // respect tabindex if it's present, but it's rare that
-      // anybody bothers)
       $el.find("form:not(.apos-filter) :input:visible:enabled:first").focus();
     });
   });
 
   return $el;
 };
+
+apos.nestedModal = function(sel, options) {
+  var $el = $(sel);
+  apos.setupModalListeners(sel, options);
+
+
+  if (!options) {
+    options = {};
+  }
+
+  apos.afterYield(function() {
+    options.init(function(err) {
+      if (err) {
+        hideModal();
+        return;
+      }
+      apos.pushSelection();
+
+      $el.data('aposSavedScrollTop', $(window).scrollTop());
+      apos._modalStack.push($el);
+
+      // append this modal to the modal container, which should already exist.
+      $('.apos-modal-container').append($el);
+      
+      
+      
+      $el.show();
+      $el.addClass('apos-open');
+      // $el.css({ left: '1px' })
+
+      $el.find("form:not(.apos-filter) :input:visible:enabled:first").focus();
+    });
+  });
+
+  return $el;
+}
 
 // Clone the element matching the specified selector that
 // also has the apos-template class, remove the apos-template
@@ -423,7 +460,11 @@ apos.modalFromTemplate = function(sel, options) {
     });
   };
 
-  return apos.modal($el, options);
+  if(apos.getTopModalOrBody().hasClass('apos-modal')) {
+    return apos.nestedModal($el, options);
+  } else {
+    return apos.modal($el, options);
+  }
 };
 
 // SELECTIONS
