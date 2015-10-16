@@ -39,7 +39,8 @@
   <div data-pager></div>
   {% if data.choose %}
     <div data-choose>
-      {{ schemas.selectBody(data.choose) }}
+      {{ apos.log(data.choose) }}
+      {{ schemas.fields([ data.choose ]) }}
       <h4><a href="#" data-save>Done</a></h4>
     </div>
   {% endif %}
