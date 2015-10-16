@@ -301,6 +301,7 @@
   <div data-selective data-name="{{ field.name }}">
     <input type="text" data-autocomplete {% if field.placeholder %}placeholder="{{ __( field.placeholder ) }}"{%endif %}/>
     <span class="apos-limit-indicator" data-limit-indicator>{{ __('Limit Reached!') }}</span>
+    <a href="#" data-choose>Browse &gt;</a>
     <ul data-list class="apos-selective-list">
       {# This is a template for creating the real items, #}
       {# it will be cloned as needed #}

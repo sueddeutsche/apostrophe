@@ -1,13 +1,14 @@
 {%- extends "apostrophe-modal:baseSlideable.html" -%}
 {%- import "apostrophe-modal:macros.html" as modals -%}
 {%- import "piecesMacros.html" as pieces with context -%}
+{%- import "apostrophe-schemas:macros.html" as schemas -%}
 
 {%- block modalClass -%}
   {{ (data.name + '-manager') | css }} apos-ui-modal-no-sidebar apos-modal-slideable
 {%- endblock -%}
 
 {%- block controls -%}
-  {{ modals.button({dataAttrs: 'data-cancel', float: 'left', arrow: 'left', label: __('Done')}) }}
+  {{ modals.button({dataAttrs: 'data-cancel', float: 'left', arrow: 'left', label: __('Cancel' if data.choose else 'Done')}) }}
   {{ modals.button({dataAttrs: ('data-create-' + data.options.name) | css, float: 'right', arrow: 'right', color: 'base', label: __( 'New %s', __(data.options.label) )}) }}
 {%- endblock -%}
 
@@ -18,7 +19,11 @@
 {%- endblock -%}
 
 {%- block label -%}
-  {{ __('Manage %s', __(data.options.pluralLabel) | e ) }}
+  {% if data.choose %}
+    {{ __('Choose %s', __(data.options.pluralLabel) | e ) }}
+  {% else %}
+    {{ __('Manage %s', __(data.options.pluralLabel) | e ) }}
+  {% endif %}
 {%- endblock -%}
 
 {%- block body -%}
@@ -32,4 +37,10 @@
   </table>
   {# ajax populates me #}
   <div data-pager></div>
+  {% if data.choose %}
+    <div data-choose>
+      {{ schemas.selectBody(data.choose) }}
+      <h4><a href="#" data-save>Done</a></h4>
+    </div>
+  {% endif %}
 {%- endblock -%}
