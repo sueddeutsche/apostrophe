@@ -56,3 +56,13 @@
     }
   }
 }
+
+.apos-manage-choose {
+  // The autocomplete text fields and browse button are hidden because
+  // we're already in the "browser" and the main search field of the manage view
+  // can be used to accomplish searches. jquery selective is just reflecting
+  // choices made and editing order and metadata. -Tom
+  .apos-selective-autocomplete, .apos-selective-browse-button {
+    display: none;
+  }
+}

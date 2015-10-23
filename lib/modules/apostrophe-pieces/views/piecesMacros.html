@@ -18,7 +18,11 @@
 
 {%- macro manageControls() -%}
   {{ buttons.minor('Cancel', { action: 'cancel' }) }}
-  {{ buttons.major('Add ' + data.options.label, { action: 'create-' + data.options.name }) }}
+  {% if data.choose %}
+    {{ buttons.major('Done', { action: 'save' }) }}
+  {% else %}
+    {{ buttons.major('Add ' + data.options.label, { action: 'create-' + data.options.name }) }}
+  {% endif %}
 {%- endmacro -%}
 
 {%- macro pill(name, choices, state) -%}

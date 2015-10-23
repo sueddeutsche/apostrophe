@@ -8,12 +8,12 @@
 {%- endblock -%}
 
 {%- block controls -%}
-  {{ pieces.manageControls() }}
+  {{ pieces.manageControls(data) }}
 {%- endblock -%}
 
 {%- block filters -%}
   {# ajax populates me #}
-  <div class="apos-ui-modal-filters-inner" data-filters>
+  <div class="apos-ui-modal-filters-inner" data-manage-filters>
   </div>
 {%- endblock -%}
 
@@ -27,22 +27,22 @@
 
 {%- block body -%}
   <div class="apos-table">
-    <table data-items class="apos-manage-table">
-      <thead data-headings>
+    <table data-manage-items class="apos-manage-table">
+      <thead data-manage-headings>
         {# ajax populates me #}
       </thead>
-      <tbody data-list>
+      <tbody data-manage-list>
         {# ajax populates me #}
       </tbody>
     </table>
   </div>
   {# ajax populates me #}
-  <div data-pager></div>
+  <div data-manage-pager class="apos-manage-pager"></div>
   {% if data.choose %}
-    <div data-choose>
-      {{ apos.log(data.choose) }}
+    {# apos-manage-choose is used to hide components of jquery selective that #}
+    {# don't make sense here, if you change the class name account for that. -Tom #}
+    <div data-manage-choose class="apos-manage-choose">
       {{ schemas.fields([ data.choose ]) }}
-      <h4><a href="#" data-save>Done</a></h4>
     </div>
   {% endif %}
 {%- endblock -%}
