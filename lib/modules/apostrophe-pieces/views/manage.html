@@ -26,6 +26,11 @@
 {%- endblock -%}
 
 {%- block body -%}
+  {% if data.choose %}
+    <div data-manage-choose class="apos-manage-choose">
+      {# ajax populates me #}
+    </div>
+  {% endif %}
   <div class="apos-table">
     <table data-manage-items class="apos-manage-table">
       <thead data-manage-headings>
@@ -38,11 +43,4 @@
   </div>
   {# ajax populates me #}
   <div data-manage-pager class="apos-manage-pager"></div>
-  {% if data.choose %}
-    {# apos-manage-choose is used to hide components of jquery selective that #}
-    {# don't make sense here, if you change the class name account for that. -Tom #}
-    <div data-manage-choose class="apos-manage-choose">
-      {{ schemas.fields([ data.choose ]) }}
-    </div>
-  {% endif %}
 {%- endblock -%}
