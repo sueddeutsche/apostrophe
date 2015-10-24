@@ -1,0 +1,9 @@
+{% for item in data.choices %}
+  <div class="apos-choice">
+    <a href="#" data-remove>x</a>
+    <a href="#" data-up>^</a>
+    <a href="#" data-down>v</a>
+    <span class="apos-choice-title">{{ item.title }}</span>
+  </div>
+{% endfor %}
+
